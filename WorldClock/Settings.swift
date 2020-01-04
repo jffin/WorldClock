@@ -11,6 +11,9 @@
 import Foundation
 import AppKit
 
+import OSLog
+
+
 class Settings {
     enum TimeHourFormat: String {
         case twelveHour     = "hh:mma"
@@ -124,17 +127,26 @@ class Settings {
             return nil
         }
         
-        guard let retrievedData = NSKeyedUnarchiver.unarchiveObject(with: savedData as Data) as? T else {
-            print("Could not unarachive: \(key) data!")
-            return nil
+        do {
+            guard let retrievedData = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(savedData as Data) as? T else {
+                print("Could not unarachive: \(key) data!")
+                return nil
+            }
+            return retrievedData
+        } catch {
+            os_log("Failed to retrive saved data", log: OSLog.default, type: .error)
         }
-        
-        return retrievedData
+        return nil
     }
 
     // Catch all save function
     fileprivate static func saveData(data: Any, key: String) {
-        let savedData = NSKeyedArchiver.archivedData(withRootObject: data)
-        UserDefaults.standard.set(savedData, forKey: key)
+        do {
+            let savedData = try NSKeyedArchiver.archivedData(withRootObject: data, requiringSecureCoding: true)
+            UserDefaults.standard.set(savedData, forKey: key)
+            
+        } catch {
+            os_log("Failed to save meals...", log: OSLog.default, type: .error)
+        }
     }
 }

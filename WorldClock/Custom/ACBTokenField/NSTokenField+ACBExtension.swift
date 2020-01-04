@@ -494,7 +494,7 @@ fileprivate class ACBTokenFieldController: NSObject, NSTokenFieldDelegate {
     
     
     func tokenField(_ tokenField: NSTokenField,
-                    representedObjectForEditing editingString: String) -> Any {
+                    representedObjectForEditing editingString: String) -> Any? {
         let token = ACBToken(name: editingString)
         
         return token
