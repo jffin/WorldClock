@@ -40,6 +40,24 @@ struct CityTime {
         df.dateFormat = Settings.loadTimeFormatFromPreferences().rawValue
         return df.string(from: Date())
     }
+    
+    var diff: String {
+        // Setup timezone
+        let df = DateFormatter()
+        df.timeZone = TimeZone(identifier: timezoneID)
+        
+        var secondsFromLocalGMT: Int { return TimeZone.current.secondsFromGMT() }
+        let timeDiff = df.timeZone.secondsFromGMT() - secondsFromLocalGMT
+        
+        if (timeDiff == 0) {
+            return "Os Time"
+        }
+        let direction: String = timeDiff > 0 ? "ahead" : "behind"
+        
+        // Get time difference
+        let (h, _, _) = secondsToHoursMinutesSeconds(seconds: timeDiff)
+        return "\(h) Hours \(direction)"
+    }
 }
 
 func findTimezoneFromCity(toFind: String) -> CityTime? {
@@ -49,4 +67,8 @@ func findTimezoneFromCity(toFind: String) -> CityTime? {
 func retrieveSavedCities() -> [CityTime] {
     let savedCities: [String] = Settings.loadCitiesFromPreferences()
     return savedCities.compactMap{ findTimezoneFromCity(toFind: $0) }
+}
+
+func secondsToHoursMinutesSeconds (seconds : Int) -> (Int, Int, Int) {
+  return (seconds / 3600, (seconds % 3600) / 60, (seconds % 3600) % 60)
 }

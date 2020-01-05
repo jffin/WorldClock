@@ -15,6 +15,7 @@ class ClockView: NSView {
     var cityLabel: NSTextField = NSTextField(labelWithString: "")
     var dateLabel: NSTextField = NSTextField(labelWithString: "")
     var timeLabel: NSTextField = NSTextField(labelWithString: "")
+    var diffLabel: NSTextField = NSTextField(labelWithString: "")
     
     override init(frame frameRect: NSRect) {
         super.init(frame:frameRect);
@@ -38,12 +39,14 @@ class ClockView: NSView {
         cityLabel.font = NSFont.systemFont(ofSize: 23)
         dateLabel.font = NSFont.systemFont(ofSize: 13)
         timeLabel.font = NSFont.systemFont(ofSize: 51, weight: .light)
+        diffLabel.font = NSFont.systemFont(ofSize: 9)
         timeLabel.alignment = .right
         
         // Grouping UI elements
         let leftStack = NSStackView()
         leftStack.addView(cityLabel, in: .top)
         leftStack.addView(dateLabel, in: .bottom)
+        leftStack.addView(diffLabel, in: .bottom)
         leftStack.orientation = .vertical
         leftStack.distribution = .fill
         leftStack.spacing = 4
@@ -95,6 +98,10 @@ class ClockView: NSView {
         let timeAttributedString = baseTimeString.string.hasPrefix("0") ? baseTimeString.attributedSubstring(from: NSRange(location: 1, length: baseTimeString.length - 1)) : baseTimeString
         let timeString = NSMutableAttributedString(attributedString: timeAttributedString)
         
+        // diff time
+        let baseDiffString = NSAttributedString.init(string: thisCity.diff)
+        let diffString = NSMutableAttributedString(attributedString: baseDiffString)
+        
         // If some maniac is using 12-hour format, make the am/pm not-ridiculous
         if (timeString.string.contains(Character("m"))) {
             let smallFont: NSFont = NSFont.systemFont(ofSize: 12)
@@ -103,5 +110,6 @@ class ClockView: NSView {
         
         timeLabel.attributedStringValue = timeString
         dateLabel.attributedStringValue = dateString
+        diffLabel.attributedStringValue = diffString
     }
 }
